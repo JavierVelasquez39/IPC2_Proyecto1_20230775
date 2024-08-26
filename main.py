@@ -15,8 +15,30 @@ def Menu():
     return opc
 
 def LeerArchivoET(rutaArchivo):
-    tree = ET.parse(rutaArchivo) 
-    root = tree.getroot() 
+    try:
+        tree = ET.parse(rutaArchivo)
+        root = tree.getroot()
+        
+        if root.tag != 'matrices':
+            print("Error: La raíz del archivo XML debe ser 'matrices'.")
+            return
+        
+        for matriz in root.findall('matriz'):
+            nombre = matriz.get('nombre')
+            n = int(matriz.get('n'))
+            m = int(matriz.get('m'))
+            print(f"Matriz: {nombre}, Filas: {n}, Columnas: {m}")
+            
+            for dato in matriz.findall('dato'):
+                x = int(dato.get('x'))
+                y = int(dato.get('y'))
+                valor = dato.text
+                print(f"Dato - Fila: {x}, Columna: {y}, Valor: {valor}")
+                
+    except ET.ParseError as e:
+        print(f"Error al parsear el archivo XML: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == '__main__':
     opc = 0
@@ -49,5 +71,4 @@ if __name__ == '__main__':
         else:
             print('Opción no válida')
             continue
-
     
