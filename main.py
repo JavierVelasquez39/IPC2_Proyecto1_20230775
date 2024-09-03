@@ -2,6 +2,15 @@ from xml.dom import minidom
 from xml.dom.minidom import Document
 import time
 from os import startfile, system
+import unicodedata
+import re
+
+def normalizar_nombre(nombre):
+    # Eliminar acentos y caracteres especiales
+    nombre_normalizado = unicodedata.normalize('NFKD', nombre).encode('ASCII', 'ignore').decode('ASCII')
+    # Reemplazar caracteres no alfanuméricos por guiones bajos
+    nombre_normalizado = re.sub(r'[^a-zA-Z0-9_]', '_', nombre_normalizado)
+    return nombre_normalizado
 
 class Nodo:
     def __init__(self, nombre, n, m, datos=None):
@@ -206,7 +215,7 @@ class MatrizBinaria:
         filas_unicas = 0
 
         temp = self.matriz.datos.cabeza
-        for i in range(self.matriz.n):  # Use matriz.n to keep original dimensions
+        for i in range(self.matriz.n):  
             fila_temp = temp.datos.cabeza
             patron = ""
             for j in range(self.m):
@@ -241,7 +250,7 @@ class MatrizBinaria:
                         fila_temp = fila_temp.siguiente
                     else:
                         nueva_fila.agregar("0", 0, 0, None)
-                matriz_reducida.agregar(patron, self.matriz.n, self.m, nueva_fila)  # Use matriz.n to keep original dimensions
+                matriz_reducida.agregar(patron, self.matriz.n, self.m, nueva_fila)  
                 self.patrones.agregar(patron)
                 self.frecuencias.agregar(patron, 1)
                 filas_unicas += 1
@@ -275,10 +284,11 @@ class MatrizBinaria:
                 break
 
     def crearGraphviz(self):
-        if self.matriz.n == 0 or self.m == 0:  # Use matriz.n to keep original dimensions
+        if self.matriz.n == 0 or self.m == 0:  
             print("Dimensiones inválidas")
             return
         
+        nombre_normalizado = normalizar_nombre(self.nombre)
         textoDOT = '''digraph G {
     node[shape=plaintext];
     edge[style=invis];
@@ -290,7 +300,7 @@ class MatrizBinaria:
     '''
 
         actual = self.matriz.datos.cabeza
-        for i in range(self.matriz.n):  # Use matriz.n to keep original dimensions
+        for i in range(self.matriz.n):  
             textoDOT += "   <tr>\n"
             for j in range(self.m):
                 textoDOT += f"<td>{actual.datos.cabeza.nombre}</td>\n"
@@ -306,14 +316,15 @@ class MatrizBinaria:
         with open("matriz.dot", "w") as dot_file:
             dot_file.write(textoDOT)
 
-        system('dot -Tpdf matriz.dot -o ' + self.nombre + ".pdf")
-        startfile(self.nombre + ".pdf")
+        system('dot -Tpdf matriz.dot -o ' + nombre_normalizado + ".pdf")
+        startfile(nombre_normalizado + ".pdf")
 
     def crearGraphvizReducida(self):
         if self.n == 0 or self.m == 0:
             print("Dimensiones inválidas")
             return
         
+        nombre_normalizado = normalizar_nombre(self.nombre)
         textoDOT = '''digraph G {
     node[shape=plaintext];
     edge[style=invis];
@@ -341,8 +352,8 @@ class MatrizBinaria:
         with open("matriz_reducida.dot", "w") as dot_file:
             dot_file.write(textoDOT)
 
-        system('dot -Tpdf matriz_reducida.dot -o ' + self.nombre + "_reducida.pdf")
-        startfile(self.nombre + "_reducida.pdf")
+        system('dot -Tpdf matriz_reducida.dot -o ' + nombre_normalizado + "_reducida.pdf")
+        startfile(nombre_normalizado + "_reducida.pdf")
 
 def leer_archivo(ruta):
     doc = minidom.parse(ruta)
@@ -398,7 +409,7 @@ def escribir_archivo(matrices_binarias, ruta_salida):
         matriz.setAttribute('nombre', matriz_binaria.nombre)
         matriz.setAttribute('n', str(matriz_binaria.n))
         matriz.setAttribute('m', str(matriz_binaria.m))
-        matriz.setAttribute('g', str(matriz_binaria.frecuencias.contar()))  # g es igual al número de grupos en la matriz reducida
+        matriz.setAttribute('g', str(matriz_binaria.frecuencias.contar()))  
         matrices.appendChild(matriz)
 
         fila_actual = matriz_binaria.datos_binarios.cabeza
@@ -427,7 +438,7 @@ def escribir_archivo(matrices_binarias, ruta_salida):
         frecuencia_actual = matriz_binaria.frecuencias.cabeza
         while frecuencia_actual:
             frecuencia_element = doc.createElement('frecuencia')
-            frecuencia_element.setAttribute('g', frecuencia_actual.patron)  # Use the pattern as the group identifier
+            frecuencia_element.setAttribute('g', frecuencia_actual.patron) 
             frecuencia_element.appendChild(doc.createTextNode(str(frecuencia_actual.frecuencia)))
             matriz.appendChild(frecuencia_element)
 
