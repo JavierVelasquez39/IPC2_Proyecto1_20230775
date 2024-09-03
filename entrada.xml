@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <matrices>
-    <matriz nombre="Ejemplo" n="4" m="4">
+    <matriz nombre="Ejemplo" n="5" m="4">
         <dato x="1" y="1">2</dato>
         <dato x="1" y="2">3</dato>
         <dato x="1" y="3">0</dato>
