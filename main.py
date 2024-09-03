@@ -425,15 +425,13 @@ def escribir_archivo(matrices_binarias, ruta_salida):
 
         # Escribir las frecuencias después de todos los datos
         frecuencia_actual = matriz_binaria.frecuencias.cabeza
-        g = 1
         while frecuencia_actual:
             frecuencia_element = doc.createElement('frecuencia')
-            frecuencia_element.setAttribute('g', str(g))
+            frecuencia_element.setAttribute('g', frecuencia_actual.patron)  # Use the pattern as the group identifier
             frecuencia_element.appendChild(doc.createTextNode(str(frecuencia_actual.frecuencia)))
             matriz.appendChild(frecuencia_element)
 
             frecuencia_actual = frecuencia_actual.siguiente
-            g += 1
             if frecuencia_actual == matriz_binaria.frecuencias.cabeza:
                 break
 
