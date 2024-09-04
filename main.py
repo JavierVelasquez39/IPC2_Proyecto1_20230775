@@ -20,6 +20,40 @@ class Nodo:
         self.datos = datos
         self.siguiente = None
 
+class NodoGrupo:
+    def __init__(self, patron, grupo):
+        self.patron = patron
+        self.grupo = grupo
+        self.siguiente = None
+
+class ListaGrupos:
+    def __init__(self):
+        self.cabeza = None
+
+    def agregar(self, patron, grupo):
+        nuevo_nodo = NodoGrupo(patron, grupo)
+        if not self.cabeza:
+            self.cabeza = nuevo_nodo
+            nuevo_nodo.siguiente = self.cabeza
+        else:
+            temp = self.cabeza
+            while temp.siguiente != self.cabeza:
+                temp = temp.siguiente
+            temp.siguiente = nuevo_nodo
+            nuevo_nodo.siguiente = self.cabeza
+
+    def buscar(self, patron):
+        if not self.cabeza:
+            return None
+        temp = self.cabeza
+        while True:
+            if temp.patron == patron:
+                return temp
+            temp = temp.siguiente
+            if temp == self.cabeza:
+                break
+        return None
+
 class ListaCircular:
     def __init__(self):
         self.cabeza = None
@@ -436,9 +470,19 @@ def escribir_archivo(matrices_binarias, ruta_salida):
 
         # Escribir las frecuencias después de todos los datos
         frecuencia_actual = matriz_binaria.frecuencias.cabeza
+        grupos = ListaGrupos()
+        grupo = 1
+        fila_actual = matriz_binaria.datos_binarios.cabeza
         while frecuencia_actual:
+            patron = frecuencia_actual.patron
+            nodo_grupo = grupos.buscar(patron)
+            if not nodo_grupo:
+                grupos.agregar(patron, grupo)
+                grupo += 1
+                nodo_grupo = grupos.buscar(patron)
+
             frecuencia_element = doc.createElement('frecuencia')
-            frecuencia_element.setAttribute('g', frecuencia_actual.patron) 
+            frecuencia_element.setAttribute('g', str(nodo_grupo.grupo))  # Asignar el número de grupo
             frecuencia_element.appendChild(doc.createTextNode(str(frecuencia_actual.frecuencia)))
             matriz.appendChild(frecuencia_element)
 
